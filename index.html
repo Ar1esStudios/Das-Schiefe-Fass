@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Das Schiefe Fass</title>
+<style>
+:root{--bg:#12161c;--brass:#d4a83f;--ink:#efe6d2;--mute:#9a9078;--card:#1c222b;--ok:#6fbf73;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% -10%,#2a2217,var(--bg) 60%);color:var(--ink);font:16px/1.4 Karla,system-ui,sans-serif;min-height:100vh}
+h1,h2,h3{font-family:"Alfa Slab One",Georgia,serif;font-weight:400;margin:0}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;gap:12px;flex-wrap:wrap}
+h1{font-size:clamp(22px,4vw,34px);color:var(--brass);text-shadow:0 0 18px #d4a83f66}
+.btn{background:#2b3440;color:var(--ink);border:1px solid #46566a;border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer}
+.btn.gold{background:#7a4a08;border-color:var(--brass)}.btn.on{background:#d4a83f;color:#2a1604}
+button:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+main{display:grid;grid-template-columns:240px minmax(300px,400px) 1fr;gap:18px;padding:0 18px 24px;max-width:1240px;margin:0 auto}
+@media(max-width:1000px){main{grid-template-columns:minmax(300px,420px) 1fr}.stage{grid-column:1;grid-row:1}.story{grid-column:1;grid-row:2}.side{grid-column:2;grid-row:1/3}}
+@media(max-width:760px){main{grid-template-columns:1fr}.stage,.story,.side{grid-column:1;grid-row:auto}.story{position:static;max-height:240px}}
+.stage{background:linear-gradient(#1a1410,#241810);border:2px solid #4a3220;border-radius:14px;padding:12px;text-align:center;overflow:hidden;position:relative;align-self:start}
+#scene{transition:filter .5s;transform-origin:50% 90%;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+.rank{font-family:"Alfa Slab One",serif;color:var(--brass);font-size:20px}
+.stats{display:flex;justify-content:space-around;margin:6px 0;gap:6px}
+.stats b{display:block;font-size:20px}.stats span{color:var(--mute);font-size:13px}
+.meter{height:22px;background:#0b0d10;border-radius:11px;border:1px solid #46566a;overflow:hidden;margin:6px 0 2px}
+#bar{height:100%;width:0;background:linear-gradient(90deg,#e8c44a,#e8782a,#c8321f);transition:width .2s}
+#drink{margin-top:8px;width:100%;font:700 24px "Alfa Slab One",serif;background:linear-gradient(#f4b73a,#c97d0e);color:#2a1604;border:0;border-radius:12px;padding:16px;cursor:pointer;box-shadow:0 5px 0 #7a4a08}
+#drink:active{transform:translateY(4px);box-shadow:0 1px 0 #7a4a08}
+.fl{position:absolute;pointer-events:none;color:#ffe08a;font:700 20px "Alfa Slab One",serif;text-shadow:0 2px 4px #000;animation:fl .9s ease-out forwards}
+@keyframes fl{to{transform:translateY(-80px);opacity:0}}
+.side{display:flex;flex-direction:column;gap:12px}
+.box{background:var(--card);border:1px solid #2f3946;border-radius:12px;padding:12px 14px}
+.box h3{font-size:17px;color:var(--brass);margin-bottom:8px}
+#sum{font-size:15px;line-height:1.7}#sum b{color:var(--brass)}
+.amt{display:flex;gap:6px;align-items:center;margin-bottom:8px}.amt span{color:var(--mute);margin-right:4px}
+.bd{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #2a323d}
+.bd .nm{flex:1}.bd strong{display:block}.bd small{color:var(--mute);font-size:13px}
+.bd .own{font:700 26px "Alfa Slab One",serif;color:#566377;min-width:40px;text-align:right}
+.bd button{min-width:118px;background:#2d5d34;color:#fff;border:0;border-radius:8px;padding:8px;font:700 14px Karla,sans-serif;cursor:pointer}
+.bd button:disabled{background:#2a2f36;color:#777;cursor:not-allowed}
+#ups{display:flex;flex-wrap:wrap;gap:8px}
+#ups button{background:#1f2630;color:var(--ink);border:2px solid var(--brass);border-radius:10px;padding:6px 10px;font:inherit;cursor:pointer;text-align:left;font-size:14px}
+#ups button small{display:block;color:var(--mute)}#ups button b{color:var(--brass)}
+#ups button.no{border-color:#34404f;opacity:.55;cursor:not-allowed}
+.story{background:#0d1015;border:1px solid #2a323d;border-radius:12px;padding:12px 14px;align-self:start;position:sticky;top:10px;max-height:calc(100vh - 20px);overflow:auto}.story h3{font-size:17px;color:var(--brass);margin-bottom:8px}
+#log p{margin:0 0 10px;font-size:15px;color:var(--mute)}#log p:first-child{color:var(--ink);border-left:3px solid var(--brass);padding-left:8px}
+.ov{position:fixed;inset:0;background:#000c;display:none;z-index:9;overflow:auto;padding:14px}
+.wp{max-width:520px;margin:12vh auto 0;text-align:center;background:#1c140d;border:3px solid var(--brass);border-radius:14px;padding:24px}
+#menu{background:radial-gradient(ellipse at 50% 15%,#3a2a14,#0c0f14 70%)}
+.mn{max-width:420px;margin:5vh auto 0;text-align:center;display:flex;flex-direction:column;gap:10px}
+.mn h1{font-size:clamp(40px,9vw,64px);line-height:1;margin-bottom:2px}
+.mn .sub{color:var(--mute);margin-bottom:12px}
+.mn button{font:700 20px "Alfa Slab One",serif;padding:13px;border-radius:12px;border:2px solid #4a3220;background:linear-gradient(#2d2418,#1b150d);color:var(--ink);cursor:pointer;transition:transform .15s,border-color .15s}
+.mn button:hover{transform:scale(1.03);border-color:var(--brass)}
+.mn button.main{background:linear-gradient(#f4b73a,#c97d0e);color:#2a1604;border:0;box-shadow:0 5px 0 #7a4a08}
+#toasts{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:20;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:max-content;max-width:92vw}
+.ts{background:#2d2418;border:2px solid var(--brass);border-radius:10px;padding:8px 14px;animation:ts 3.5s forwards}
+@keyframes ts{0%{opacity:0;transform:translateY(-10px)}10%{opacity:1;transform:none}85%{opacity:1}100%{opacity:0}}
+.gj{position:absolute;z-index:5;width:68px;height:68px;border-radius:50%;border:0;cursor:pointer;background:radial-gradient(circle at 35% 30%,#fff7b0,#f2b520 55%,#a86a00);box-shadow:0 0 24px #ffd24a;font:700 11px "Alfa Slab One",serif;color:#5a3400;animation:pulse 1s ease-in-out infinite alternate}
+@keyframes pulse{to{transform:scale(1.15)}}
+body.nopop .fl{display:none}body.nobub .bub{display:none}body.calm #scene{filter:none!important;transform:none!important}
+.sk{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #2a323d}.sw{width:34px;height:44px;border-radius:4px 4px 10px 10px;border:2px solid #dfe9f0aa}
+.ac{padding:6px 0;border-top:1px solid #2a323d}.ac.dn b{color:var(--ok)}.ac.lk{opacity:.5}
+.st{display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid #2a323d}
+.gst{opacity:0;transition:opacity .9s}.gst.on{opacity:1}.gb{animation:bob 2.6s ease-in-out infinite alternate}@keyframes bob{to{transform:translateY(-3px)}}
+body.calm .gb{animation:none}@media(prefers-reduced-motion:reduce){.gb{animation:none}.gst{transition:none}}
+.bub{animation:rise 3s linear infinite}
+@keyframes rise{from{transform:translateY(0);opacity:.8}to{transform:translateY(-190px);opacity:0}}
+@media(prefers-reduced-motion:reduce){.bub,.fl{animation:none}.fl{display:none}#scene{transition:none}}
+h1,h2,h3,.rank{font-weight:900}
+#panel{z-index:16}#q{z-index:17!important}
+.ccb{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 8px}.ccb button{flex:1 1 150px;padding:11px;font-weight:700}
+#login label{display:block;margin:10px 0}#lgName{display:block;width:100%;margin-top:4px;padding:10px;border-radius:8px;border:1px solid #46566a;background:#0d1015;color:var(--ink);font:inherit}
+.ck{display:flex!important;gap:8px;align-items:flex-start;font-size:15px}.ck input{margin-top:4px;accent-color:var(--brass)}
+.wp a{color:var(--brass)}
+.lbh,.lbr{display:grid;grid-template-columns:44px 1fr 110px 60px;gap:6px;padding:7px 4px;border-top:1px solid #2a323d;align-items:center}.lbh{color:var(--mute);font-size:13px;border:0}.lbr span:nth-child(3),.lbr span:nth-child(4),.lbh span:nth-child(3),.lbh span:nth-child(4){text-align:right}.lbr.me{background:#d4a83f22;border-radius:6px}
+.lg{font-size:14px;line-height:1.55}.lg h4{margin:12px 0 4px;color:var(--brass)}.ph{background:#d4a83f22;padding:0 4px;border-radius:4px}
+.mlinks{margin-top:8px;font-size:14px;color:var(--mute)}.mlinks a{color:var(--mute);margin:0 6px;cursor:pointer}
+</style></head><body>
+<header><h1>Das Schiefe Fass</h1><div><button class="btn" id="lbBtn">🏆 Rangliste</button> <button class="btn" id="accBtn">Konto</button> <button class="btn" id="vbtn">Lautstärke</button> <button class="btn" id="mute">Ton an</button> <button class="btn" id="mbtn">Menü</button> <button class="btn" id="reset">Neu starten</button></div></header>
+<main>
+<aside class="story"><h3>Story</h3><div id="log" aria-live="polite"></div></aside>
+<section class="stage" id="stage" aria-label="Bar">
+<div class="rank" id="rank">Laufkundschaft</div><div id="boost" style="color:#ffe08a;font-weight:700;min-height:22px"></div>
+<div id="scene"><svg viewBox="0 0 420 330" width="100%" role="img" aria-label="Eine Kneipe mit Tresen, Gästen und einem Bierglas, anklicken zum Trinken">
+<defs>
+<linearGradient id="wl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c2016"/><stop offset="1" stop-color="#17100a"/></linearGradient>
+<linearGradient id="gl" x1="0" x2="1"><stop offset="0" stop-color="#ffffff55"/><stop offset=".3" stop-color="#ffffff10"/><stop offset="1" stop-color="#ffffff33"/></linearGradient>
+<linearGradient id="be" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc83d"/><stop offset="1" stop-color="#c76a05"/></linearGradient>
+<linearGradient id="wd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b4226"/><stop offset=".5" stop-color="#4a2c17"/><stop offset="1" stop-color="#2d1a0d"/></linearGradient>
+<clipPath id="cp"><path d="M92 40 L208 40 L194 262 Q150 274 106 262 Z"/></clipPath>
+<radialGradient id="lamp"><stop offset="0" stop-color="#ffd27a88"/><stop offset="1" stop-color="#ffd27a00"/></radialGradient>
+</defs>
+<rect width="420" height="262" fill="url(#wl)"/>
+<path d="M60 0V262M140 0V262M220 0V262M300 0V262M380 0V262" stroke="#0004" stroke-width="2"/>
+<text x="12" y="26" font-family="Alfa Slab One,Georgia,serif" font-size="15" fill="#ff7a59" style="filter:drop-shadow(0 0 5px #ff4a2a)">Zum Schiefen Fass</text>
+<rect x="14" y="100" width="392" height="6" fill="#6b4226"/>
+<g id="shelf"></g>
+<circle cx="210" cy="60" r="170" fill="url(#lamp)"/>
+<g id="guests"></g>
+<g transform="translate(60,0)">
+<path d="M208 80 Q262 85 258 150 Q254 212 200 218" fill="none" stroke="#cfd8e0aa" stroke-width="14" stroke-linecap="round"/>
+<g clip-path="url(#cp)"><rect id="beer" x="80" y="40" width="140" height="240" fill="url(#be)"/>
+<rect id="foam" x="80" y="30" width="140" height="22" fill="#fff6dc"/>
+<g fill="#fff8" id="bubs"></g></g>
+<path d="M92 40 L208 40 L194 262 Q150 274 106 262 Z" fill="url(#gl)" stroke="#dfe9f0aa" stroke-width="3"/>
+<path d="M104 56 L112 250" stroke="#fff9" stroke-width="5" stroke-linecap="round"/>
+</g>
+<rect x="0" y="262" width="420" height="68" fill="url(#wd)"/>
+<rect x="0" y="262" width="420" height="7" fill="#8b5a33"/>
+<path d="M0 290 H420 M0 312 H420" stroke="#0004" stroke-width="2"/>
+</svg></div>
+<div class="stats"><div><b id="sBal">0</b><span>Bier-Konto</span></div><div><b id="sBps">0</b><span>Bier pro Sekunde</span></div><div><b id="sRun">0</b><span>Bier diese Nacht</span></div></div>
+<div class="meter" role="progressbar" aria-label="Fortschritt zum Ziel" id="pm"><div id="bar"></div></div>
+<div><b id="prom">0,0 %</b> <span style="color:var(--mute)">· Ziel: 100 % = <span id="goal"></span></span></div>
+<button id="drink">Trinken!</button>
+<div style="color:var(--mute);font-size:13px;margin-top:6px">Klicken, tippen oder Leertaste</div>
+</section>
+<section class="side">
+<div class="box" id="sum"></div>
+<div class="box"><h3>Neue Nacht (Rebirth)</h3><div id="rinfo" style="margin-bottom:8px"></div><button class="btn gold" id="rbtn">Neue Nacht starten</button></div>
+<div class="box" id="adbox"><h3>Gratis-Boosts</h3><div style="color:var(--mute);font-size:14px;margin-bottom:6px">Freiwillig: Schau eine kurze Werbung und bekomme einen Boost.</div><div id="adb"></div></div>
+<div class="box"><h3>Upgrades</h3><div id="ups"></div></div>
+<div class="box"><h3>Gebäude</h3><div class="amt"><span>Kaufmenge:</span><button class="btn" data-a="1">×1</button><button class="btn" data-a="10">×10</button><button class="btn" data-a="100">×100</button></div><div id="shop"></div></div>
+</section>
+</main>
+<div class="ov" id="cc" role="dialog" aria-label="Datenschutz-Einstellungen" style="z-index:15"><div class="wp" style="text-align:left;margin-top:7vh"><h2 style="font-size:24px;color:var(--brass);margin-bottom:10px">🍪 Deine Privatsphäre</h2><p>Das Spiel speichert deinen Spielstand, deine Einstellungen und dein Spielerkonto lokal in deinem Browser. Das ist technisch notwendig, damit das Spiel funktioniert. Für die Rangliste werden dein Spielername und deine Spielwerte gespeichert.</p><p>Wenn du zustimmst, dürfen wir dir freiwillige Belohnungs-Werbung zeigen. Der Werbepartner kann dafür Cookies oder ähnliche Technologien nutzen, bei „Alle akzeptieren“ auch, um zu dir passende Werbung auszuwählen. <b>Derzeit ist noch keine Werbung aktiv.</b></p><p>Ohne Zustimmung kannst du genauso spielen. Deine Wahl kannst du jederzeit unter „Konto → Cookie-Einstellungen“ ändern oder widerrufen.</p><div class="ccb"><button class="btn" id="ccNone">Nur notwendige</button><button class="btn" id="ccNpa">Nur nicht-personalisierte Werbung</button><button class="btn" id="ccAll">Alle akzeptieren</button></div><p style="font-size:13px"><a href="#" data-legal="privacy">Datenschutzerklärung</a> · <a href="#" data-legal="imprint">Impressum</a></p></div></div>
+<div class="ov" id="login" role="dialog" aria-label="Anmelden" style="z-index:14"><div class="wp" style="text-align:left;margin-top:7vh"><h2 style="font-size:24px;color:var(--brass);margin-bottom:8px">Anmelden</h2><p style="color:var(--mute)">Wähle deinen Spielernamen. Er erscheint in der Rangliste. Wir brauchen keine E-Mail und kein Passwort: Dein Konto ist an diesen Browser gebunden.</p><label>Spielername<input id="lgName" maxlength="16" autocomplete="nickname" placeholder="z. B. Ole"></label><label class="ck"><input type="checkbox" id="lgTerms"><span>Ich akzeptiere die <a href="#" data-legal="terms">Nutzungsbedingungen</a> und habe die <a href="#" data-legal="privacy">Datenschutzerklärung</a> gelesen.</span></label><label class="ck"><input type="checkbox" id="lgAge"><span>Ich bin mindestens 14 Jahre alt oder meine Eltern sind einverstanden.</span></label><div id="lgErr" style="color:#ff8a7a;min-height:22px"></div><button class="btn gold" id="lgOk">Los geht's</button></div></div>
+<div id="toasts"></div>
+<div class="ov" id="menu" role="dialog" aria-label="Hauptmenü"><div class="mn"><h1>Das Schiefe Fass</h1><div class="sub">Trink dich zur Legende.</div>
+<button class="main" id="mPlay">Spielen</button><button id="mNew">Neues Spiel</button><button data-p="shop">Shop</button><button data-p="inv">Inventar</button><button data-p="ach">Erfolge</button><button data-p="stats">Statistiken</button><button id="mSet">Einstellungen</button><button id="mLb">🏆 Rangliste</button><button id="mAcc">Konto</button><button data-p="cred">Credits</button><div class="mlinks"><a data-legal="privacy">Datenschutz</a>·<a data-legal="terms">Nutzungsbedingungen</a>·<a data-legal="imprint">Impressum</a>·<a id="mCk">Cookie-Einstellungen</a></div></div></div>
+<div class="ov" id="panel" role="dialog"><div class="wp" style="text-align:left;margin-top:6vh"><h2 id="pt" style="font-size:26px;color:var(--brass);margin-bottom:10px"></h2><div id="pb"></div><br><button class="btn" id="pclose">Schließen</button></div></div>
+<div class="ov" id="vol" role="dialog" aria-label="Lautstärke"><div class="wp" style="margin-top:10vh;text-align:left"><h2 style="font-size:24px;color:var(--brass);margin-bottom:14px">Lautstärke</h2><label>Musik <b id="vm"></b><input type="range" id="rm" min="0" max="100" style="width:100%;display:block;accent-color:var(--brass)"></label><br><label>Effekte <b id="vs"></b><input type="range" id="rs" min="0" max="100" style="width:100%;display:block;accent-color:var(--brass)"></label><p style="color:var(--mute);font-size:14px">Wenn nichts zu hören ist, klick oben auf „Ton an“.</p><div style="margin:12px 0"><label style="display:block;margin:6px 0"><input type="checkbox" id="tpop"> Zahlen bei Klicks anzeigen</label><label style="display:block;margin:6px 0"><input type="checkbox" id="tbub"> Blasen im Glas</label><label style="display:block;margin:6px 0"><input type="checkbox" id="tcalm"> Ruhiges Bild (kein Wackeln und Verschwimmen)</label><button class="btn" id="tfull">Vollbild an/aus</button></div><button class="btn" id="vclose">Schließen</button></div></div>
+<div class="ov" id="ad" role="dialog" style="z-index:13"><div class="wp" style="margin-top:12vh"><h3 style="font-size:20px;color:var(--brass)">Werbepause (Demo)</h3><p>Hier läuft später echte Werbung. In <b id="adc">5</b> Sekunden bekommst du deine Belohnung.</p><div style="height:120px;background:#222;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#777">Platz für Werbung</div><br><button class="btn gold" id="adok" disabled>Belohnung holen</button> <button class="btn" id="adx">Abbrechen</button></div></div>
+<div class="ov" id="q" role="dialog" style="z-index:12"><div class="wp" style="margin-top:20vh"><p id="qt" style="font-size:18px"></p><button class="btn gold" id="qy">Ja</button> <button class="btn" id="qn">Abbrechen</button></div></div>
+<div class="ov" id="win" role="dialog"><div class="wp"><h2 style="font-size:30px;color:var(--brass)">Gewonnen!</h2><p>Ole kippt nach einer Milliarde Bier vom Hocker, das ganze Land jubelt: Das goldene Fass gehört dir. Gespielt: <b id="wt"></b> Minuten, <b id="wr"></b> Neue Nächte.</p><button class="btn" id="cont">Weiterspielen</button> <button class="btn" id="again">Ganz neu starten</button></div></div>
+<script>
+"use strict";
+const $=id=>document.getElementById(id),P=Math.pow;
+const fmt=n=>{n=Math.floor(n);if(n>=1e12)return(n/1e12).toFixed(2).replace(".",",")+" Bio";if(n>=1e9)return(n/1e9).toFixed(2).replace(".",",")+" Mrd";if(n>=1e6)return(n/1e6).toFixed(2).replace(".",",")+" Mio";return n.toLocaleString("de-DE")};
+const n2=n=>n>=1000?fmt(n):String(+n.toFixed(n<10?2:1)).replace(".",",");
+const GOALS=[1e6,5e7,1.5e8,4e8,1e9],KEY="schiefesFass3";
+const goal=()=>GOALS[Math.min(S.gi,GOALS.length-1)];
+const GSTORY=["Die erste Million! Hannes haut auf den Tresen: „Das war nur das Warmlaufen, Ole. Jetzt kommt die Stadtmeisterschaft: 50 Millionen Bier!“","Die Stadt liegt dir zu Füßen. Ede flüstert: „Die Landesmeisterschaft ruft. 150 Millionen, und alle Augen sind auf dich gerichtet.“","Das ganze Land feiert dich. Oma Lotte lächelt: „Jetzt fehlt nur noch die Weltmeisterschaft im Dauertrinken. 400 Millionen!“","Die Weltmeisterschaft ist gewonnen. Kurt rollt das letzte Fass heran: „Eine Milliarde Bier, Ole. Dann gehört das goldene Fass dir.“"];
+const BD=[["Zapfhahn",.1,15],["Kellnerin",1,100],["Fassbatterie",8,1100],["Hausbrauerei",47,12e3],["Bierfabrik",260,13e4],["Bierfluss",1400,14e5],["Bierzug",7800,2e7],["Bierportal",44000,33e7]];
+const RN=["I","II","III","IV"],TI=[[1,10],[5,50],[25,500],[50,5e3]];
+const CKN=["Größere Gläser","Maßkrug","Riesenkrug","Fass-Stemmen","Bier-Biss"],CKR=[1e2,1e3,1e4,1e5,1e6];
+const GLN=["Wettschein","Stammtisch-Bonus","Goldenes Fass","Bierkönig","Bierbaron","Fassgott","Ewiges Fass"],GLR=[1e3,1e4,1e5,3e5,2e6,3e7,2e8],GLC=[5e3,5e4,2.5e5,8e5,4e6,6e7,4e8],GLM=[1.5,1.75,2,2.5,2,2,2];
+const UPG=[];
+BD.forEach((b,i)=>TI.forEach(([n,m],k)=>UPG.push({id:"t"+i+"_"+k,n:b[0]+" "+RN[k]+" verbessern",d:b[0]+" ×2",c:b[2]*m,ok:()=>(S.own[i]||0)>=n})));
+CKN.forEach((n,k)=>UPG.push({id:"c"+k,n:n,d:"Klickkraft ×2",c:CKR[k],ok:()=>S.run>=CKR[k]/2}));
+GLN.forEach((n,k)=>UPG.push({id:"g"+k,n:n,d:"Alles ×"+String(GLM[k]).replace(".",","),c:GLC[k],ok:()=>S.run>=GLR[k]}));
+UPG.push({id:"keller",n:"Bierkeller",d:"Schaltet Neue Nacht frei",c:2e4,ok:()=>S.run>=5e3});
+const RANK=[[0,"Laufkundschaft"],[500,"Stammgast"],[5e3,"Zecher"],[5e4,"Fass-Baron"],[5e5,"Legende"],[5e6,"Bier-Gott"]];
+const STORY=[
+[0,"Ole stolpert ins „Schiefe Fass“. Wirt Hannes grinst: „Heute Nacht ist die Meisterschaft. Wer als Erster vom Hocker kippt, gewinnt das goldene Fass.“"],
+[500,"Oma Lotte nickt dir zu. „Ich hab seit 1974 keinen Kater gehabt. Setz dich, ich zeig dir was.“"],
+[5e3,"Wettkönig Ede wedelt mit Scheinen: „Die Leute wetten auf dich, Kleiner. Trink schneller!“"],
+[5e4,"Braumeister Kurt rollt ein Fass herein. „Meine Brauerei direkt hinterm Tresen. Der Nachschub reißt nie ab.“"],
+[8e5,"Die Bar ist voll. Alle singen deinen Namen, leicht schief, wie das Fass."],
+[2e7,"Der Raum dreht sich nur noch. Hannes flüstert: „Noch ein paar Krüge, und du bist Stadtlegende.“"]];
+let S,AC,muted=true,last=0,seen=0,glass=1,bt=0,amt=1,lastSnd=0,upSig="";
+const fresh=()=>({life:0,run:0,bal:0,own:{},up:{},gold:0,reb:0,t:0,story:0,gi:0,won:false,over:false,clicks:0,golden:0,caps:0,ach:{},skins:{std:1},skin:"std",hist:[],adCd:{},adBoostEnd:0,ads:0});
+function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.own)return Object.assign(fresh(),j)}catch(e){}return fresh()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const cnt=p=>Object.keys(S.up).filter(k=>k.indexOf(p)===0).length;
+const mm=()=>GLM.reduce((p,m,k)=>S.up["g"+k]?p*m:p,1)*(1+.05*S.gold)*(performance.now()<boostEnd?7:1)*(Date.now()<(S.adBoostEnd||0)?3:1);
+const per=i=>BD[i][1]*P(2,cnt("t"+i+"_"))*mm();
+const bps=()=>BD.reduce((s,b,i)=>s+(S.own[i]||0)*per(i),0);
+const clickPow=()=>P(2,cnt("c"))*mm();
+const gg=()=>Math.floor(Math.sqrt(S.run/1e4)),rebMin=()=>Math.round(5e4*P(2.5,S.reb)/1e3)*1e3,canReb=()=>S.up.keller&&S.run>=rebMin();
+const bcost=(i,n)=>Math.ceil(BD[i][2]*P(1.15,S.own[i]||0)*(P(1.15,n)-1)/.15);
+/* Audio: alles live synthetisiert, keine Fremdsamples */
+function ac(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();return AC}
+let SG;const VOL=(()=>{try{return Object.assign({m:.7,s:.8},JSON.parse(localStorage.getItem("fassVol")))}catch(e){return{m:.7,s:.8}}})();
+function sfx(){if(!SG){SG=AC.createGain();SG.gain.value=VOL.s;SG.connect(AC.destination)}return SG}
+function noise(dur,type,f,v,q){if(muted)return;const c=ac(),b=c.createBuffer(1,c.sampleRate*dur,c.sampleRate),a=b.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const fl=c.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q||1;const g=c.createGain();g.gain.setValueAtTime(v,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+dur);s.connect(fl).connect(g).connect(sfx());s.start()}
+function tone(f,f2,dur,type,v,delay){if(muted)return;const c=ac(),t=c.currentTime+(delay||0),o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g).connect(sfx());o.start(t);o.stop(t+dur)}
+const sGulp=()=>{tone(260,110,.16,"sine",.25);tone(200,90,.14,"sine",.2,.12);noise(.25,"lowpass",500,.18)};
+const sClink=()=>{tone(2400,2380,.35,"sine",.08);tone(3300,3280,.25,"sine",.05)};
+const sCoin=()=>{tone(988,988,.1,"square",.06);tone(1319,1319,.35,"square",.06,.09)};
+const sWin=()=>[392,494,587,784,988].forEach((f,i)=>tone(f,f,.4,"triangle",.15,i*.14));
+let musT,MG,HB,step=0,nextT=0;
+const R=[48,45,41,43],CH=[[60,64,67],[57,60,64],[57,60,65],[59,62,67]],MEL=[[4,4,7,4,0,null,4,7],[9,9,12,9,7,null,4,7],[9,9,12,9,5,null,9,12],[7,7,11,7,2,null,4,7]];
+function mn(m,t,d,type,v){const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=440*Math.pow(2,(m-69)/12);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(MG);o.start(t);o.stop(t+d+.05)}
+function kick(t){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(40,t+.15);g.gain.setValueAtTime(.35,t);g.gain.exponentialRampToValueAtTime(.001,t+.18);o.connect(g).connect(MG);o.start(t);o.stop(t+.2)}
+function hat(t){if(!HB){HB=AC.createBuffer(1,AC.sampleRate*.05,AC.sampleRate);const a=HB.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=Math.random()*2-1}const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=HB;f.type="highpass";f.frequency.value=7000;g.gain.setValueAtTime(.05,t);g.gain.exponentialRampToValueAtTime(.001,t+.05);s.connect(f).connect(g).connect(MG);s.start(t)}
+function note(s,t){const b=s>>3,i=s&7;if(i%4===0){mn(i===4?R[b]+7:R[b],t,.3,"triangle",.2);kick(t)}else if(i%2===0)CH[b].forEach(m=>mn(m,t,.12,"square",.025));if(i%2===1)hat(t);const m=MEL[b][i];if(m!==null)mn(72+m,t,.22,"triangle",.09)}
+function sched(){if(muted||!AC)return;while(nextT<AC.currentTime+.3){note(step,nextT);nextT+=.25;step=(step+1)%32}}
+function ambient(){if(muted||musT)return;const c=ac();if(!MG){MG=c.createGain();MG.gain.value=VOL.m*.7;MG.connect(c.destination)}nextT=c.currentTime+.1;step=0;musT=setInterval(sched,100)}
+function stopMusic(){clearInterval(musT);musT=null}
+/* Spiel */
+function build(){const sh=$("shop");sh.innerHTML="";BD.forEach((b,i)=>{const r=document.createElement("div");r.className="bd";r.innerHTML=`<div class="nm"><strong>${b[0]}</strong><small id="bs${i}"></small></div><div class="own" id="bo${i}">0</div><button id="bb${i}"></button>`;r.querySelector("button").onclick=()=>buyB(i);sh.appendChild(r)});
+const bs=$("bubs");bs.innerHTML="";for(let i=0;i<14;i++){const c=document.createElementNS("http://www.w3.org/2000/svg","circle");c.setAttribute("class","bub");c.setAttribute("cx",110+Math.random()*80);c.setAttribute("cy",250);c.setAttribute("r",1.5+Math.random()*2.5);c.style.animationDelay=(-Math.random()*3)+"s";c.style.animationDuration=(2+Math.random()*2)+"s";bs.appendChild(c)}}
+function buyB(i){const c=bcost(i,amt);if(S.bal>=c){S.bal-=c;S.own[i]=(S.own[i]||0)+amt;sCoin();save();ui()}}
+function buyU(id){const u=UPG.find(x=>x.id===id);if(u&&!S.up[id]&&u.ok()&&S.bal>=u.c){S.bal-=u.c;S.up[id]=1;sCoin();save();upSig="";ui()}}
+function gain(g){S.run+=g;S.bal+=g;S.life+=g}
+function say(t){const p=document.createElement("p");p.textContent=t;$("log").prepend(p)}
+function ui(){const b=bps();$("sBal").textContent=fmt(S.bal);$("sBps").textContent=n2(b);$("sRun").textContent=fmt(S.run);$("goal").textContent=fmt(goal())+" Bier (Ziel "+(Math.min(S.gi,GOALS.length-1)+1)+" von "+GOALS.length+")";
+const pr=Math.min(1,S.run/goal());$("bar").style.width=pr*100+"%";$("prom").textContent=(pr*100).toFixed(1).replace(".",",")+" %";$("pm").setAttribute("aria-valuenow",Math.round(pr*100));
+let r=RANK[0][1];RANK.forEach(k=>{if(S.life>=k[0])r=k[1]});$("rank").textContent=r+(S.reb?" · Nacht "+(S.reb+1):"");
+$("sum").innerHTML="<b>Deine Werte</b><br>Pro Klick: "+n2(clickPow())+" Bier<br>Pro Sekunde: "+n2(b)+" Bier<br>Bier-Ertrag: ×"+n2(mm())+" (Fassgold: "+S.gold+", +"+S.gold*5+" %)";
+$("rinfo").textContent=!S.up.keller?"Kaufe zuerst das Upgrade „Bierkeller“.":S.run<rebMin()?"Ab "+fmt(rebMin())+" Bier in dieser Nacht (noch "+fmt(rebMin()-S.run)+"). Jede Neue Nacht verlangt mehr.":"+"+gg()+" Fassgold, je +5 % Bier für immer. Skills und Konto werden zurückgesetzt.";$("rbtn").disabled=!canReb();
+BD.forEach((x,i)=>{const c=bcost(i,amt);$("bo"+i).textContent=S.own[i]||0;$("bs"+i).textContent=n2(per(i))+" Bier/s pro Stück";$("bb"+i).textContent=amt+"× · "+fmt(c);$("bb"+i).disabled=S.bal<c});
+const av=UPG.filter(u=>!S.up[u.id]&&u.ok()).sort((a,c)=>a.c-c.c).slice(0,8),sig=av.map(u=>u.id+(S.bal>=u.c?1:0)).join();
+if(sig!==upSig){upSig=sig;$("ups").innerHTML=av.length?av.map(u=>`<button data-id="${u.id}" class="${S.bal>=u.c?"":"no"}"><b>${u.n}</b><small>${u.d}</small>${fmt(u.c)} Bier</button>`).join(""):"<span style=\"color:var(--mute)\">Gerade nichts verfügbar. Kauf Gebäude oder trink weiter.</span>"}}
+function frame(now){const dt=Math.min(.25,(now-last)/1000);last=now;if(!S.won){gain(bps()*dt);S.t+=dt;
+while(S.story<STORY.length&&S.life>=STORY[S.story][0]){say(STORY[S.story][1]);S.story++}
+if(S.run>=goal()){if(S.gi<GOALS.length-1){S.gi++;S.caps+=10;toast("Ziel erreicht! +10 Kronkorken");say(GSTORY[S.gi-1]);sWin();save()}else if(!S.over){S.won=true;sWin();$("wt").textContent=Math.max(1,Math.round(S.t/60));$("wr").textContent=S.reb;$("win").style.display="block";save()}}}
+glass+=(1-glass)*Math.min(1,dt*3);bt+=dt;
+const y=40+(1-glass)*230;$("beer").setAttribute("y",y);$("foam").setAttribute("y",y-10);
+const w=Math.min(1,S.run/goal());$("scene").style.filter="blur("+(w*w*3.2).toFixed(2)+"px)";$("scene").style.transform="rotate("+(Math.sin(bt*(1+w))*w*4).toFixed(2)+"deg)";
+if(now-seen>150){seen=now;ui();tick2()}requestAnimationFrame(frame)}
+function click(e){if(S.won||blocked())return;ambient();S.clicks++;const g=clickPow();gain(g);glass=Math.max(.35,glass-.12);
+const t=performance.now();if(t-lastSnd>90){lastSnd=t;sGulp();if(Math.random()<.15)setTimeout(sClink,120)}
+const st=$("stage"),r=st.getBoundingClientRect(),f=document.createElement("span");f.className="fl";f.textContent="+"+n2(g);
+const x=e&&e.clientX?e.clientX-r.left:r.width/2,y=e&&e.clientY?e.clientY-r.top:r.height/2;f.style.left=(x-10+(Math.random()*30-15))+"px";f.style.top=(y-20)+"px";st.appendChild(f);setTimeout(()=>f.remove(),900)}
+function rebirth(){if(!canReb())return;const g=gg();ask("Neue Nacht starten? Gebäude, Upgrades und Bier-Konto werden zurückgesetzt. Du bekommst "+g+" Fassgold (+"+g*5+" % Bier für immer).",()=>{if(!canReb())return;S.gold+=gg();S.reb++;S.run=0;S.bal=0;S.own={};S.up={};S.won=false;S.over=false;upSig="";say("Neue Nacht! Das Fassgold glänzt: Alles geht jetzt schneller.");sCoin();save();ui()})}
+function restart(){lastStory=-1;S=fresh();setTimeout(applySkin,0);$("log").innerHTML="";$("win").style.display="none";glass=1;upSig="";build();ui();save()}
+$("drink").onclick=click;$("scene").onclick=click;$("rbtn").onclick=rebirth;
+$("ups").onclick=e=>{const b=e.target.closest("button");if(b)buyU(b.dataset.id)};
+document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{amt=+b.dataset.a;document.querySelectorAll("[data-a]").forEach(x=>x.classList.toggle("on",x===b));ui()});
+document.querySelector("[data-a=\"1\"]").classList.add("on");
+$("mute").onclick=()=>{muted=!muted;$("mute").textContent=muted?"Ton an":"Ton aus";if(!muted){ac();ambient();sClink()}else stopMusic()};
+$("reset").onclick=()=>ask("Spielstand wirklich löschen? Alles beginnt von vorn.",restart);$("again").onclick=restart;
+$("cont").onclick=()=>{S.won=false;S.over=true;$("win").style.display="none"};
+addEventListener("keydown",e=>{if(e.code==="Space"&&!e.repeat){e.preventDefault();if($("win").style.display!=="block")click()}});
+addEventListener("keyup",e=>{if(e.code==="Space")e.preventDefault()});
+function setVol(){if(MG)MG.gain.value=VOL.m*.7;if(SG)SG.gain.value=VOL.s;$("vm").textContent=Math.round(VOL.m*100)+" %";$("vs").textContent=Math.round(VOL.s*100)+" %";try{localStorage.setItem("fassVol",JSON.stringify(VOL))}catch(e){}}
+$("rm").value=VOL.m*100;$("rs").value=VOL.s*100;
+$("rm").oninput=e=>{VOL.m=e.target.value/100;setVol()};$("rs").oninput=e=>{VOL.s=e.target.value/100;setVol()};$("rs").onchange=()=>{if(!muted)sClink()};
+$("vbtn").onclick=()=>{$("vol").style.display="block"};$("vclose").onclick=()=>{$("vol").style.display="none"};
+setVol();
+/* Menü, Panels, Erfolge, Shop, Goldener Krug */
+let boostEnd=0,nextGold=performance.now()+40000,CUR="";
+const SET=(()=>{try{return Object.assign({pop:true,bub:true,calm:false},JSON.parse(localStorage.getItem("fassSet")))}catch(e){return{pop:true,bub:true,calm:false}}})();
+function applySet(){document.body.classList.toggle("nopop",!SET.pop);document.body.classList.toggle("nobub",!SET.bub);document.body.classList.toggle("calm",SET.calm);$("tpop").checked=SET.pop;$("tbub").checked=SET.bub;$("tcalm").checked=SET.calm;try{localStorage.setItem("fassSet",JSON.stringify(SET))}catch(e){}}
+const blocked=()=>["menu","panel","vol","win","q","ad","cc","login"].some(i=>$(i).style.display==="block");
+function toast(t){const d=document.createElement("div");d.className="ts";d.textContent=t;$("toasts").appendChild(d);setTimeout(()=>d.remove(),3600)}
+const tb=()=>BD.reduce((a,b,i)=>a+(S.own[i]||0),0);
+const ACH=[
+["first","Erster Schluck","1 Klick",2,()=>S.clicks>=1],
+["c100","Durstiger Zeigefinger","100 Klicks",3,()=>S.clicks>=100],
+["c1k","Klick-Maschine","1.000 Klicks",5,()=>S.clicks>=1000],
+["b1","Erster Mitarbeiter","Kauf dein erstes Gebäude",2,()=>tb()>=1],
+["b50","Betrieb läuft","50 Gebäude gleichzeitig",5,()=>tb()>=50],
+["b200","Bierimperium","200 Gebäude gleichzeitig",8,()=>tb()>=200],
+["m1","Erste Million","1 Mio Bier insgesamt",5,()=>S.life>=1e6],
+["g2","Stadtmeister","50 Mio Bier in einer Nacht",8,()=>S.gi>=2],
+["g4","Weltmeister","400 Mio Bier in einer Nacht",15,()=>S.gi>=4],
+["r1","Neue Nacht","Dein erster Rebirth",5,()=>S.reb>=1],
+["r5","Nachtschwärmer","5 Rebirths",10,()=>S.reb>=5],
+["j1","Goldener Fang","Fang einen Goldenen Krug",3,()=>S.golden>=1],
+["j10","Krug-Jäger","10 Goldene Krüge",8,()=>S.golden>=10],
+["u10","Aufrüster","10 Upgrades in einer Nacht",5,()=>Object.keys(S.up).length>=10]];
+function chkAch(){ACH.forEach(a=>{if(!S.ach[a[0]]&&a[4]()){S.ach[a[0]]=1;S.caps+=a[3];toast("Erfolg: "+a[1]+" (+"+a[3]+" Kronkorken)");sCoin()}})}
+const SK={std:["Standard-Pils",0,"#ffc83d","#c76a05","#fff6dc"],dark:["Dunkles Bock",10,"#8a4a1c","#2e1405","#e8d3b0"],kirsch:["Kirsch-Bier",25,"#ff6a5a","#a3162f","#ffe3e3"],weizen:["Weizen-Gold",40,"#ffe27a","#e0a020","#ffffff"],gold:["Königs-Gold",60,"#fff3a0","#d4a017","#fffdf0"]};
+function applySkin(){const c=SK[S.skin]||SK.std,g=document.querySelectorAll("#be stop");g[0].setAttribute("stop-color",c[2]);g[1].setAttribute("stop-color",c[3]);$("foam").setAttribute("fill",c[4])}
+const sw=k=>'<div class="sw" style="background:linear-gradient('+SK[k][2]+','+SK[k][3]+')"></div>';
+function ask(t,yes){$("qt").textContent=t;$("q").style.display="block";$("qy").onclick=()=>{$("q").style.display="none";yes()};$("qn").onclick=()=>{$("q").style.display="none"}}
+function buySk(k){const p=SK[k][1];if(S.skins[k]||S.caps<p)return;ask("„"+SK[k][0]+"“ für "+p+" Kronkorken kaufen?",()=>{if(S.skins[k]||S.caps<p)return;S.caps-=p;S.skins[k]=1;S.hist.unshift(SK[k][0]+" · "+p+" Kronkorken · "+new Date().toLocaleDateString("de-AT"));S.hist=S.hist.slice(0,20);sCoin();save();openPanel(CUR)})}
+function eqSk(k){if(S.skins[k]){S.skin=k;applySkin();save();openPanel(CUR)}}
+function openPanel(k){CUR=k;let h="",t="";
+if(k==="shop"){t="Shop";h='<p>Kronkorken: <b style="color:var(--brass)">'+S.caps+'</b> (gibt es für Erfolge, Ziele und Goldene Krüge)</p>'+Object.keys(SK).map(i=>'<div class="sk">'+sw(i)+'<div style="flex:1"><b>'+SK[i][0]+'</b><br><small style="color:var(--mute)">Glas-Skin · '+(SK[i][1]?SK[i][1]+' Kronkorken':'gratis')+'</small></div>'+(S.skins[i]?'<span style="color:var(--ok)">Besitzt du</span>':'<button class="btn" data-buy="'+i+'"'+(S.caps<SK[i][1]?' disabled':'')+'>Kaufen</button>')+'</div>').join("")}
+else if(k==="inv"){t="Inventar";h=Object.keys(SK).filter(i=>S.skins[i]).map(i=>'<div class="sk">'+sw(i)+'<b style="flex:1">'+SK[i][0]+'</b>'+(S.skin===i?'<span style="color:var(--ok)">Aktiv</span>':'<button class="btn" data-eq="'+i+'">Ausrüsten</button>')+'</div>').join("")+'<h3 style="margin:14px 0 6px;font-size:16px">Kaufhistorie</h3>'+(S.hist.length?S.hist.map(x=>'<div class="st">'+x+'</div>').join(""):'<small style="color:var(--mute)">Noch nichts gekauft.</small>')}
+else if(k==="ach"){t="Erfolge ("+Object.keys(S.ach).length+"/"+ACH.length+")";h=ACH.map(a=>'<div class="ac '+(S.ach[a[0]]?'dn':'lk')+'"><b>'+a[1]+'</b> · +'+a[3]+' Kronkorken<br><small style="color:var(--mute)">'+a[2]+'</small></div>').join("")}
+else if(k==="stats"){t="Statistiken";h=[["Bier insgesamt",fmt(S.life)],["Bier diese Nacht",fmt(S.run)],["Klicks",fmt(S.clicks)],["Spielzeit",Math.floor(S.t/60)+" Min."],["Neue Nächte",S.reb],["Fassgold",S.gold],["Gebäude",tb()],["Goldene Krüge",S.golden],["Erfolge",Object.keys(S.ach).length+" / "+ACH.length],["Kronkorken",S.caps],["Aktuelles Ziel",fmt(goal())+" Bier"]].map(r=>'<div class="st"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join("")}
+else{t="Credits";h='<p><b>Das Schiefe Fass</b></p><p>Ein Spiel von <b>Ar1esStudios</b>.</p><p>Grafik: selbst gezeichnete Vektorgrafiken (SVG).</p><p>Musik und Sounds: live im Browser erzeugt, keine Fremdsamples.</p><p>Schriften: Systemschriften deines Geräts (es werden keine Schriften von fremden Servern geladen).</p><p style="color:var(--mute)">Alle Figuren, Namen und Texte sind erfunden.</p>'}
+$("pt").textContent=t;$("pb").innerHTML=h;$("panel").style.display="block"}
+$("pb").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.buy)buySk(b.dataset.buy);if(b.dataset.eq)eqSk(b.dataset.eq);if(b.dataset.act)accAct(b.dataset.act)};
+function tick2(){const now=performance.now();chkAch();visG();updAds();$("boost").textContent=[now<boostEnd?"Bierrausch ×7: "+Math.ceil((boostEnd-now)/1000)+" s":"",Date.now()<(S.adBoostEnd||0)?"Werbe-Boost ×3: "+Math.ceil((S.adBoostEnd-Date.now())/1000)+" s":""].filter(Boolean).join(" · ");
+if(now>nextGold&&!blocked()&&!document.querySelector(".gj")&&!S.won){nextGold=now+45000+Math.random()*75000;const b=document.createElement("button");b.className="gj";b.textContent="Goldener Krug";b.style.left=(10+Math.random()*70)+"%";b.style.top=(25+Math.random()*50)+"%";
+b.onclick=()=>{b.remove();S.golden++;S.caps++;if(Math.random()<.55){boostEnd=performance.now()+30000;toast("Bierrausch! 30 Sekunden lang ×7 Bier")}else{const g=Math.max(clickPow()*60,bps()*40);gain(g);toast("Fassregen! +"+fmt(g)+" Bier")}sCoin();save()};
+$("stage").appendChild(b);setTimeout(()=>b.remove(),12000)}}
+function showMenu(){$("mPlay").textContent=S.life>0?"Weiterspielen":"Spielen";$("menu").style.display="block"}
+$("mPlay").onclick=()=>{if(!flow())return;$("menu").style.display="none";if(muted)$("mute").click();if(!S.tut){S.tut=1;say("Tipp: Kronkorken aus Erfolgen kaufen im Menü neue Glas-Skins.");say("Tipp: Kauf rechts Gebäude, sie liefern Bier von allein. Goldene Krüge geben Bonus.");say("Tipp: Klick aufs Glas, den Button oder die Leertaste, um zu trinken.")}};
+$("mNew").onclick=()=>{const go=()=>{restart();$("mPlay").click()};if(S.life===0)go();else ask("Alles löschen und neu beginnen?",go)};
+document.querySelectorAll("#menu [data-p]").forEach(b=>b.onclick=()=>openPanel(b.dataset.p));
+$("mSet").onclick=()=>{$("vol").style.display="block"};$("mbtn").onclick=showMenu;$("pclose").onclick=()=>{$("panel").style.display="none"};
+$("tpop").onchange=e=>{SET.pop=e.target.checked;applySet()};$("tbub").onchange=e=>{SET.bub=e.target.checked;applySet()};$("tcalm").onchange=e=>{SET.calm=e.target.checked;applySet()};
+$("tfull").onclick=()=>{try{(document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()).catch(()=>{})}catch(e){}};
+$("vbtn").textContent="Einstellungen";document.querySelector("#vol h2").textContent="Einstellungen";
+addEventListener("keydown",e=>{if(e.code==="Escape"){$("panel").style.display="none";$("vol").style.display="none"}});
+/* Kneipe mit Gästen */
+let lastStory=-1;
+const GU=[
+{x:38,y:165,s:1,sk:"#e0a97a",hat:"#7a2a1a",bd:"#5a3a22",sh:"#8a2a2a",beat:0},
+{x:388,y:168,s:1,sk:"#f0c8a0",hat:"#9a9aa8",bd:null,sh:"#6a4a8a",mug:1,beat:1},
+{x:112,y:178,s:.85,sk:"#c88a5a",hat:"#1f5a3a",bd:"#222",sh:"#1f5a3a",beat:2},
+{x:338,y:178,s:.85,sk:"#e8b890",hat:"#2a3a7a",bd:"#a05a1a",sh:"#c9a22a",mug:1,beat:3},
+{x:76,y:205,s:.62,sk:"#c9a07a",hat:"#444",bd:null,sh:"#35506b",beat:4},
+{x:366,y:212,s:.6,sk:"#d8b08a",hat:"#5a4a3a",bd:"#333",sh:"#6b3a3a",mug:1,beat:4},
+{news:1,beat:5}];
+const ANN=["Wirt Hannes steht hinter dem Tresen.","Oma Lotte setzt sich an die Bar.","Wettkönig Ede gesellt sich dazu.","Braumeister Kurt rollt ein Fass herein.","Die Bar füllt sich mit Gästen.","Die Zeitung hängt dein Bild an die Wand."];
+function gst(g,i){if(g.news)return '<g class="gst" id="g'+i+'"><rect x="334" y="30" width="72" height="50" fill="#e8dcc0" stroke="#6b4226" stroke-width="3"/><text x="370" y="46" font-size="8" text-anchor="middle" font-family="Alfa Slab One,serif" fill="#222">Ole, der Mann</text><text x="370" y="57" font-size="8" text-anchor="middle" font-family="Alfa Slab One,serif" fill="#222">ohne Boden</text><rect x="340" y="63" width="60" height="3" fill="#999"/><rect x="340" y="70" width="44" height="3" fill="#999"/></g>';
+return '<g class="gst" id="g'+i+'" transform="translate('+g.x+','+g.y+') scale('+g.s+')"><g class="gb" style="animation-delay:'+(-i*.7)+'s"><rect x="-18" y="12" width="36" height="120" rx="14" fill="'+g.sh+'"/><circle r="13" fill="'+g.sk+'"/>'+(g.bd?'<path d="M-12 4 Q0 30 12 4 Q0 12 -12 4Z" fill="'+g.bd+'"/>':'')+'<path d="M-14 -4 Q0 -22 14 -4 Z" fill="'+g.hat+'"/><circle cx="-4.5" cy="-1" r="1.6" fill="#222"/><circle cx="4.5" cy="-1" r="1.6" fill="#222"/>'+(g.mug?'<rect x="14" y="40" width="12" height="15" rx="2" fill="#f2b520"/>':'')+'</g></g>'}
+function buildScene(){$("guests").innerHTML=GU.map(gst).join("");const cols=["#2f6b3a","#8a5a1c","#3a5a8a","#6b2a2a","#4a4a4a"];let b="";for(let i=0;i<22;i++){const x=22+i*17,h=24+((i*7)%4)*5,c=cols[i%5];b+='<rect x="'+x+'" y="'+(100-h)+'" width="10" height="'+h+'" rx="2" fill="'+c+'"/><rect x="'+(x+3)+'" y="'+(100-h-7)+'" width="4" height="8" fill="'+c+'"/>'}$("shelf").innerHTML=b}
+function visG(){GU.forEach((g,i)=>{const e=$("g"+i);if(e)e.classList.toggle("on",S.story>g.beat)});if(S.story>lastStory){if(lastStory>=0&&ANN[S.story-1])toast(ANN[S.story-1]);lastStory=S.story}}
+/* Gratis-Boosts mit Werbung (Platzhalter) */
+const ADS={demo:true,live:false};$("adbox").style.display=ADS.live?"":"none";
+let adT=null;
+function showAd(done){
+if(ADS.demo){const o=$("ad"),b=$("adok");o.style.display="block";let n=5;b.disabled=true;$("adc").textContent=n;clearInterval(adT);
+adT=setInterval(()=>{n--;$("adc").textContent=Math.max(0,n);if(n<=0){clearInterval(adT);b.disabled=false}},1000);
+b.onclick=()=>{o.style.display="none";done()};$("adx").onclick=()=>{clearInterval(adT);o.style.display="none"};return}
+/* Hier später das SDK deines Werbenetzwerks einbauen und done() nur nach vollständig gesehener Werbung aufrufen. */}
+const AB=[
+["x3","Bier-Boost ×3 für 2 Minuten",240,()=>{S.adBoostEnd=Math.max(Date.now(),S.adBoostEnd||0)+120000;toast("Boost aktiv: Bier ×3 für 2 Minuten")}],
+["bag","Fass-Lieferung: 10 Minuten Bier sofort",360,()=>{const g=Math.max(bps()*600,clickPow()*100);gain(g);toast("Fass-Lieferung! +"+fmt(g)+" Bier")}],
+["jug","Goldenen Krug sofort rufen",300,()=>{nextGold=0;toast("Ein Goldener Krug ist unterwegs")}]];
+function buildAds(){$("adb").innerHTML=AB.map(a=>'<div class="bd"><div class="nm"><strong>'+a[1]+'</strong><small>Danach '+Math.round(a[2]/60)+' Min. Pause</small></div><button id="ab_'+a[0]+'" data-ad="'+a[0]+'">Werbung ansehen</button></div>').join("")}
+function updAds(){const now=Date.now();AB.forEach(a=>{const b=$("ab_"+a[0]);if(!b)return;const r=Math.ceil(((S.adCd||{})[a[0]]||0)-now)/1000;if(r>0){b.disabled=true;b.textContent="in "+Math.floor(r/60)+":"+String(Math.ceil(r%60)).padStart(2,"0")}else{b.disabled=false;b.textContent="Werbung ansehen"}})}
+function startAd(id){const a=AB.find(x=>x[0]===id);if(!a||(S.adCd[id]||0)>Date.now())return;showAd(()=>{S.adCd[id]=Date.now()+a[2]*1000;S.ads=(S.ads||0)+1;a[3]();sCoin();save();updAds()})}
+$("adb").onclick=e=>{const b=e.target.closest("button");if(b&&b.dataset.ad)startAd(b.dataset.ad)};
+/* ===== Konto, Einwilligung, Rangliste, Rechtliches ===== */
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const LEGAL_V=1;
+let CONS=(()=>{try{return JSON.parse(localStorage.getItem("fassConsent"))}catch(e){return null}})();
+let ACC=(()=>{try{return JSON.parse(localStorage.getItem("fassAccount"))}catch(e){return null}})();
+function saveAcc(){try{localStorage.setItem("fassAccount",JSON.stringify(ACC))}catch(e){}}
+function setCons(ads){CONS={v:LEGAL_V,ads:ads,t:Date.now()};try{localStorage.setItem("fassConsent",JSON.stringify(CONS))}catch(e){}$("cc").style.display="none";updAdBox();toast(ads==="none"?"Gespeichert: nur notwendige Speicherung, keine Werbung.":"Einwilligung gespeichert. Du kannst sie jederzeit ändern.");flow()}
+function updAdBox(){$("adbox").style.display=ADS.live&&CONS&&CONS.ads!=="none"?"":"none"}
+function flow(){if(!CONS||CONS.v!==LEGAL_V){$("cc").style.display="block";return false}if(!ACC||ACC.v!==LEGAL_V){showLogin();return false}return true}
+$("ccNone").onclick=()=>setCons("none");$("ccNpa").onclick=()=>setCons("npa");$("ccAll").onclick=()=>setCons("personalized");
+const BAD=/(nazi|hitler|sieg ?heil|fick|fuck|hure|nigg|schwuchtel|wichser|fotze|arschloch)/i;
+function showLogin(){$("lgName").value=ACC?ACC.name:"";$("lgTerms").checked=!!ACC;$("lgAge").checked=!!ACC;$("lgErr").textContent="";$("login").style.display="block";setTimeout(()=>$("lgName").focus(),50)}
+$("lgName").onkeydown=e=>{e.stopPropagation();if(e.key==="Enter")$("lgOk").click()};
+$("lgOk").onclick=()=>{const n=$("lgName").value.trim().replace(/\s+/g," ");let err="";
+if(!/^[\p{L}\p{N} _.\-]{3,16}$/u.test(n))err="Name: 3 bis 16 Zeichen, nur Buchstaben, Zahlen, Leerzeichen und _ . -";else if(BAD.test(n))err="Bitte wähle einen anderen Namen.";else if(!$("lgTerms").checked)err="Bitte akzeptiere die Nutzungsbedingungen.";else if(!$("lgAge").checked)err="Bitte bestätige dein Alter bzw. die Zustimmung deiner Eltern.";
+if(err){$("lgErr").textContent=err;return}
+const first=!ACC;ACC=Object.assign(ACC||{id:"p"+Date.now().toString(36)+Math.random().toString(36).slice(2,10),created:Date.now(),best:0},{name:n,v:LEGAL_V,agreed:Date.now()});saveAcc();$("login").style.display="none";toast(first?"Willkommen, "+n+"!":"Name gespeichert.");lastPush="";pushScore();updAcc()};
+function updAcc(){$("accBtn").textContent=ACC?"👤 "+ACC.name:"Anmelden"}
+/* Rangliste: gemeinsamer Speicher des Artefakts */
+let DB=null,lastPush="",pushing=false,DBro=false;
+try{if(window.claude&&claude.use)claude.use("db").then(d=>{DB=d;pushScore()}).catch(()=>{})}catch(e){}
+async function pushScore(){if(!DB||!ACC||pushing||DBro)return;ACC.best=Math.max(ACC.best||0,Math.floor(S.life));
+const doc={name:ACC.name,best:ACC.best,reb:S.reb,gold:S.gold,gi:S.gi,won:!!(S.won||S.over),min:Math.floor(S.t/60),at:Date.now(),v:1};
+const sig=[doc.name,doc.best,doc.reb,doc.gi,doc.won].join("|");if(sig===lastPush)return;pushing=true;
+try{await DB.doc("board/"+ACC.id).set(doc);lastPush=sig;saveAcc()}catch(e){if(e&&e.code==="invalid_argument")DBro=true}finally{pushing=false}}
+setInterval(pushScore,20000);
+function panelOpen(t,h){CUR="x";$("pt").textContent=t;$("pb").innerHTML=h;$("panel").style.display="block"}
+async function showLB(){panelOpen("🏆 Rangliste",'<p style="color:var(--mute)">Lade …</p>');
+if(!DB){$("pb").innerHTML='<p>Die Online-Rangliste ist hier gerade nicht verfügbar.</p><p style="color:var(--mute);font-size:14px">Sie funktioniert, wenn das Spiel auf claude.ai geöffnet wird und du dort angemeldet bist.</p>';return}
+const to=setTimeout(()=>{$("pb").innerHTML='<p>Die Rangliste ist gerade nicht erreichbar. Versuch es später noch einmal.</p>'},10000);
+try{await pushScore();const q=await DB.collection("board").orderBy("best","desc").limit(50).get();clearTimeout(to);
+const rows=q.docs.filter(d=>d.exists).map(d=>Object.assign({id:d.id},d.data()));
+let h=rows.length?'<div class="lbh"><span>#</span><span>Spieler</span><span>Bier gesamt</span><span>Nächte</span></div>'+rows.map((r,i)=>'<div class="lbr'+(ACC&&r.id===ACC.id?' me':'')+'"><span>'+(i<3?["🥇","🥈","🥉"][i]:i+1)+'</span><span>'+esc(r.name||"?")+(r.won?' 👑':'')+'</span><span>'+fmt(+r.best||0)+'</span><span>'+((+r.reb||0)+1)+'</span></div>').join(""):'<p>Noch keine Einträge. Sei der Erste!</p>';
+if(DBro)h+='<p style="color:var(--mute);font-size:13px">Dein Ergebnis kann nicht eingetragen werden, weil du für dieses Spiel nur Lesezugriff hast.</p>';
+h+='<p style="color:var(--mute);font-size:13px;margin-top:10px">Gewertet wird das insgesamt getrunkene Bier über alle Nächte. 👑 = Spiel gewonnen. Die Rangliste zeigt nur Spielernamen und Spielwerte.</p>';
+$("pb").innerHTML=h}catch(e){clearTimeout(to);$("pb").innerHTML='<p>Die Rangliste konnte nicht geladen werden.</p>'}}
+function showAcc(){if(!ACC){showLogin();return}const c=CONS?{none:"Nur notwendige",npa:"Nicht-personalisierte Werbung",personalized:"Alle akzeptiert"}[CONS.ads]:"noch nicht gewählt";
+panelOpen("Konto",'<div class="st"><span>Spielername</span><b>'+esc(ACC.name)+'</b></div><div class="st"><span>Angemeldet seit</span><b>'+new Date(ACC.created).toLocaleDateString("de-AT")+'</b></div><div class="st"><span>Bestes Ergebnis</span><b>'+fmt(Math.max(ACC.best||0,S.life))+' Bier</b></div><div class="st"><span>Cookie-Einstellung</span><b>'+c+'</b></div><p style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="name">Namen ändern</button><button class="btn" data-act="cookies">Cookie-Einstellungen</button><button class="btn" data-act="export">Meine Daten anzeigen</button></p><p style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="unrank">Ranglisten-Eintrag löschen</button><button class="btn" data-act="wipe" style="border-color:#a33">Konto und alle Daten löschen</button></p><p style="color:var(--mute);font-size:13px">Dein Konto ist an diesen Browser gebunden. Wenn du die Browserdaten löschst, ist auch das Konto weg.</p>')}
+async function accAct(a){if(a==="name"){$("panel").style.display="none";showLogin()}
+else if(a==="cookies"){$("panel").style.display="none";$("cc").style.display="block"}
+else if(a==="export"){panelOpen("Meine Daten",'<p style="font-size:14px">Diese Daten speichert das Spiel über dich:</p><pre style="white-space:pre-wrap;font-size:12px;background:#0d1015;padding:10px;border-radius:8px;user-select:text">'+esc(JSON.stringify({konto:ACC,einwilligung:CONS,spielstand:{bierGesamt:Math.floor(S.life),naechte:S.reb,fassgold:S.gold,erfolge:Object.keys(S.ach),spielzeitMin:Math.floor(S.t/60)}},null,2))+'</pre>')}
+else if(a==="unrank")ask("Deinen Eintrag aus der Rangliste löschen? Er wird beim Weiterspielen wieder angelegt.",async()=>{try{if(DB)await DB.doc("board/"+ACC.id).delete();lastPush="x";DBro=true;toast("Ranglisten-Eintrag gelöscht. Du erscheinst erst wieder nach einem Neuladen.")}catch(e){toast("Löschen hat nicht geklappt.")}})
+else if(a==="wipe")ask("Konto, Ranglisten-Eintrag, Spielstand und Einstellungen endgültig löschen?",async()=>{try{if(DB)await DB.doc("board/"+ACC.id).delete()}catch(e){}["fassAccount","fassConsent",KEY,"fassVol","fassSet"].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});location.reload()})}
+const LEGAL={
+privacy:["Datenschutzerklärung",'<div class="lg"><h4>Verantwortlicher</h4><p>Niklas Thum, Sommerein, Österreich<br>E-Mail: niklasthum100@gmail.com</p><h4>Was gespeichert wird</h4><p><b>Lokal in deinem Browser (technisch notwendig, § 165 Abs. 3 TKG 2021):</b> Spielstand, Einstellungen, deine Cookie-Auswahl und dein Spielerkonto (zufällige Kennung, Spielername).</p><p><b>Rangliste (nur in der Version auf claude.ai):</b> Spielername, zufällige Konto-Kennung und Spielwerte (Bier gesamt, Nächte, Fassgold, Spielzeit, gewonnen ja/nein). Zweck: Anzeige der Rangliste. Rechtsgrundlage: Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO). Speicherdauer: bis du den Eintrag oder dein Konto löschst.</p><p><b>Hosting:</b> Das Spiel wird über die Plattform itch.io (itch corp, USA) bereitgestellt. Beim Aufruf verarbeitet itch.io technisch notwendige Daten wie IP-Adresse, Zeitpunkt und Browsertyp, um die Seite auszuliefern und vor Angriffen zu schützen (Art. 6 Abs. 1 lit. f DSGVO). Dabei können Daten in die USA übermittelt werden. Für die Seite rund um das Spiel gilt zusätzlich die Datenschutzerklärung von itch.io. Es werden keine Analyse- oder Tracking-Dienste eingesetzt und keine Schriften oder Skripte von fremden Servern geladen.</p><h4>Werbung</h4><p>Derzeit ist keine Werbung aktiv und kein Werbedienst eingebunden. Wird später ein Werbepartner eingebunden, geschieht das nur mit deiner Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, § 165 Abs. 3 TKG 2021). Dieser Abschnitt wird dann um Anbieter, Daten, Zwecke und Drittlandübermittlung ergänzt.</p><h4>Deine Rechte</h4><p>Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerspruch und Widerruf deiner Einwilligung. Vieles geht direkt im Spiel unter „Konto“. Beschwerden: Österreichische Datenschutzbehörde, dsb.gv.at.</p><h4>Kinder</h4><p>Unter 14 Jahren brauchst du die Zustimmung deiner Eltern (§ 4 Abs. 4 DSG).</p></div>'],
+terms:["Nutzungsbedingungen",'<div class="lg"><h4>1. Anbieter</h4><p>Niklas Thum, Sommerein, Österreich (E-Mail: niklasthum100@gmail.com)</p><h4>2. Das Spiel</h4><p>„Das Schiefe Fass“ ist kostenlos. Es gibt keine Käufe mit echtem Geld. Bier, Kronkorken, Fassgold und Skins sind Spielwerte ohne Geldwert und nicht übertragbar.</p><h4>3. Inhalt</h4><p>Das Spiel ist eine humorvolle Fiktion. Es verherrlicht keinen Alkoholkonsum und ist keine Aufforderung zum Trinken. Bitte trink im echten Leben verantwortungsvoll.</p><h4>4. Konto und Rangliste</h4><p>Dein Spielername darf keine Beleidigungen, Namen anderer Personen, Marken oder rechtswidrigen Inhalte enthalten. Manipulierte Ergebnisse oder unpassende Namen können wir aus der Rangliste entfernen.</p><h4>5. Werbung</h4><p>Belohnungs-Werbung ist freiwillig und nur mit deiner Einwilligung möglich. Das Spiel ist ohne Werbung vollständig spielbar.</p><h4>6. Verfügbarkeit und Haftung</h4><p>Wir bemühen uns um einen störungsfreien Betrieb, können ihn aber nicht garantieren. Für Vorsatz, grobe Fahrlässigkeit und Personenschäden haften wir nach den gesetzlichen Bestimmungen.</p><h4>7. Recht</h4><p>Es gilt österreichisches Recht. Zwingende Verbraucherschutzvorschriften deines Wohnsitzlandes bleiben unberührt.</p></div>'],
+imprint:["Impressum",'<div class="lg"><p>Offenlegung gemäß § 25 Mediengesetz</p><p>Medieninhaber: Niklas Thum<br>Wohnort: Sommerein, Österreich<br>E-Mail: niklasthum100@gmail.com</p><p>Unternehmensgegenstand: keiner (privates, nicht kommerzielles Hobbyprojekt)<br>Inhalt: Das Schiefe Fass, ein kostenloses Browser-Spiel von Ar1esStudios</p></div>']};
+function showLegal(k){const L=LEGAL[k];if(L)panelOpen(L[0],L[1])}
+document.addEventListener("click",e=>{const a=e.target.closest("[data-legal]");if(a){e.preventDefault();showLegal(a.dataset.legal)}});
+$("lbBtn").onclick=showLB;$("mLb").onclick=showLB;$("accBtn").onclick=showAcc;$("mAcc").onclick=showAcc;$("mCk").onclick=()=>{$("cc").style.display="block"};
+S=load();build();buildScene();buildAds();lastStory=S.story;visG();ui();applySet();applySkin();showMenu();updAdBox();updAcc();flow();setInterval(save,10000);requestAnimationFrame(t=>{last=t;frame(t)});
+</script></body></html>
